@@ -234,12 +234,25 @@ function runCycle() {
 }
 function handleBreatheAudio(phase, dur) {
     const now = audioCtx.currentTime;
+
+    // Always cancel any scheduled values first
+    noiseGain.gain.cancelScheduledValues(now);
+    toneGain.gain.cancelScheduledValues(now);
+    filter.frequency.cancelScheduledValues(now);
+
     if (phase === 'Hold') {
-        noiseGain.gain.setTargetAtTime(0, now, 0.1);
-        toneGain.gain.setTargetAtTime(0, now, 0.1);
+        noiseGain.gain.setValueAtTime(noiseGain.gain.value, now);
+        noiseGain.gain.linearRampToValueAtTime(0, now + 0.1);
+        toneGain.gain.setValueAtTime(toneGain.gain.value, now);
+        toneGain.gain.linearRampToValueAtTime(0, now + 0.1);
         return;
     }
+
     if (currentMode === 'clicks') {
+        // Ensure silence first
+        noiseGain.gain.setValueAtTime(0, now);
+        toneGain.gain.setValueAtTime(0, now);
+
         const count = Math.floor(dur * (document.getElementById('clickSpeed').value / 10));
         for(let i=0; i<count; i++) {
             setTimeout(() => {
@@ -254,17 +267,24 @@ function handleBreatheAudio(phase, dur) {
             }, (i * (dur/count)) * 1000);
         }
     } else if (currentMode === 'solfeggio') {
+        // Ensure noise is silent
+        noiseGain.gain.setValueAtTime(0, now);
+
         const osc = audioCtx.createOscillator();
         osc.frequency.value = 528;
-        toneGain.gain.cancelScheduledValues(now);
         toneGain.gain.setValueAtTime(0, now);
         toneGain.gain.linearRampToValueAtTime(0.1, now + 0.5);
         toneGain.gain.linearRampToValueAtTime(0, now + dur);
         osc.connect(toneGain);
         osc.start(); osc.stop(now + dur);
     } else {
-        noiseGain.gain.setTargetAtTime(0.3, now, 0.5);
-        filter.frequency.setTargetAtTime(phase === 'Breathe In' ? 2000 : 400, now, 0.5);
+        // Ensure tone is silent
+        toneGain.gain.setValueAtTime(0, now);
+
+        noiseGain.gain.setValueAtTime(noiseGain.gain.value, now);
+        noiseGain.gain.linearRampToValueAtTime(0.3, now + 0.5);
+        filter.frequency.setValueAtTime(filter.frequency.value, now);
+        filter.frequency.linearRampToValueAtTime(phase === 'Breathe In' ? 2000 : 400, now + 0.5);
     }
 }
 document.getElementById('startBtn').onclick = startBreathe;
