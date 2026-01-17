@@ -1,11 +1,11 @@
 {
-  "name": "ZenBreath - ADHD & Anxiety Relief",
+  "name": "ZenBreath - Breathing & Meditation",
   "short_name": "ZenBreath",
-  "description": "Breathing exercises with customizable sounds for ADHD and anxiety relief",
-  "start_url": "/",
+  "description": "Breathing exercises and soundscapes for ADHD and anxiety relief",
+  "start_url": "./ZenBreath.html",
   "display": "standalone",
   "background_color": "#0f172a",
-  "theme_color": "#818cf8",
+  "theme_color": "#0f172a",
   "orientation": "portrait",
   "icons": [
     {
@@ -20,5 +20,7 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "categories": ["health", "lifestyle", "wellness"],
+  "screenshots": []
 }
